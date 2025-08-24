@@ -53,13 +53,21 @@ exports.findNearestSafePlaces = (originCity) => {
 
     let nearestPlaces = mumbaiSafePlaces.map(place => {
         const distance = haversine(originCoords, { lat: place.lat, lng: place.lng });
-        const googleMapsLink = `https://www.google.com/maps/dir/${originCoords.lat},${originCoords.lng}/${place.lat},${place.lng}`;
+
+        // ✅ Search by name (more user-friendly)
+        const queryName = encodeURIComponent(`${place.name}, Mumbai`);
+        const mapLink = `https://www.google.com/maps/search/?api=1&query=${queryName}`;
+
+        // ✅ Optional: Route link using lat,lng (accurate navigation)
+        const routeLink = `https://www.google.com/maps/dir/?api=1&origin=${originCoords.lat},${originCoords.lng}&destination=${place.lat},${place.lng}`;
+
         return {
             ...place,
-            distance: (distance / 1000).toFixed(2),
-            mapLink: googleMapsLink
+            distance: (distance / 1000).toFixed(2), // in km
+            mapLink,
+            routeLink
         };
     }).sort((a, b) => a.distance - b.distance);
 
-    return nearestPlaces.length > 0 ? nearestPlaces.slice(0, 3) : mumbaiSafePlaces.sort(() => 0.5 - Math.random()).slice(0, 3);
+    return nearestPlaces.slice(0, 3); // top 3
 };

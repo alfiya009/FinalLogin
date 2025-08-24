@@ -33,6 +33,7 @@ router.post('/send-by-city', async (req, res) => {
             let safePlacesHtml = '';
 
             if (nearestSafePlaces && nearestSafePlaces.length > 0) {
+                // Modified safePlacesText generation to show place name and a direct map link
                 safePlacesText = '\nNearest Safe Places:\n' + nearestSafePlaces.map((place, idx) =>
                     `${idx + 1}. ${place.name} (${place.type}) - ${place.distance} km\nMap: ${place.mapLink}`
                 ).join('\n');
@@ -41,7 +42,7 @@ router.post('/send-by-city', async (req, res) => {
                     <h2>Nearest Safe Places:</h2>
                     <ul>
                         ${nearestSafePlaces.map(place =>
-                            `<li><b>${place.name}</b> (${place.type}) - ${place.distance} km 
+                            `<li><b>${place.name}</b> (${place.type}) - ${place.distance} km
                              <br><a href="${place.mapLink}">View on Map</a></li>`
                         ).join('')}
                     </ul>
@@ -60,7 +61,6 @@ router.post('/send-by-city', async (req, res) => {
             const appLinkHtml = `<p>🚧 Check live <a href="https://akashkeote.github.io/flood/">Evacuation Routes</a> to stay safe.</p>`;
 
             for (const user of users) {
-                // SAME message for both SMS + Email
                 const smsMessage = `🚨 Flood Alert!\nYour area (${city}) is at a ${cityRisk} flood risk.\nStay safe!${safePlacesText}${appLinkText}`;
 
                 const emailSubject = `🚨 Flood Alert: ${city} - ${cityRisk} Risk`;
@@ -71,12 +71,10 @@ router.post('/send-by-city', async (req, res) => {
                     ${appLinkHtml}
                 `;
 
-                // Send SMS (always)
                 if (user.contact) {
                     await sendSMS(user.contact, smsMessage);
                 }
 
-                // Send Email (always)
                 if (user.email) {
                     await sendEmail(user.email, emailSubject, emailHtml);
                 }
