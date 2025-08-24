@@ -22,6 +22,14 @@ mongoose.connect(MONGO_URI)
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/alerts', alertRoutes);
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend is running ✅"
+  });
+});
+
 
 // ✅ Export the app for Vercel (Do NOT call app.listen)
 module.exports = app;
